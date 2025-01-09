@@ -1,0 +1,262 @@
+---
+title: "INTERNATIONAL BREWERIES ANALYSIS"
+author: "Nwakor Henry Ikenna"
+date: "2024-03-16"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## International Breweries
+
+This analysis is meant to look at the profitability of some of the products of International breweries across two Anglophone countries and three Francophone countries in Africa. A data recorded for a duration of three years is provided for analysis to aid better decision making in order to maximise profit and reduce loss to the lowest minimal.
+
+```{r International_breweries}
+library(tidyverse)
+
+library(readxl)
+International_Breweries <- read_excel("C:/Users/User/Downloads/International-Breweries.xlsx", 
+    sheet = "International-Breweries")
+International_Breweries
+
+```
+
+## Profit Analysis
+
+### 1. The profit worth of the countries within the last three years.
+
+```{r sum of profits for the last three years, echo=TRUE}
+ib<-International_Breweries
+x<-ib$PROFIT
+sum(ib$PROFIT)
+
+```
+
+After running the code above, the TOTAL WORTH OF PROFIT = 105587420
+
+### 2.Comparing the profits of the francophone and anglophone countries.
+
+``` {r filtering the table}
+AngloPhone<-ib%>%filter(COUNTRIES=="Ghana" |COUNTRIES=="Nigeria")
+AngloPhone
+x<-AngloPhone$PROFIT
+sum(AngloPhone$PROFIT)
+
+```
+The anglophone countries made a total profit of 42389260.
+
+``` {r The Francophone data}
+FrancoPhone<-ib%>%filter(COUNTRIES=="Benin" |COUNTRIES=="Senegal" | COUNTRIES=="Togo")
+FrancoPhone
+x<-FrancoPhone$PROFIT
+sum(FrancoPhone$PROFIT)
+```
+ The francophone countries made a total profit of 63198160
+ 
+ Therefore, they both made a difference of 20808900 in profit, making the francophone countries the most profitable.
+
+### The Most Profitable Country of 2019
+
+``` {r The table arranged in descending order}
+ib%>%
+  filter(YEARS==2019)%>%
+  arrange(desc(PROFIT))
+```
+
+The table above clearly shows Ghana and Senegal as the most profitable countries with profit of 269,190
+
+### 4. Which year had the most profit?
+```{r Sum of profit filtered by year}
+ib%>%
+  group_by(YEARS==2019)%>%
+  summarise(sum(PROFIT))
+
+
+ib%>%
+  group_by(YEARS==2018)%>%
+  summarise(sum(PROFIT))
+
+ib%>%
+  group_by(YEARS==2017)%>%
+  summarise(sum(PROFIT))
+``` 
+According to the data above, in the year 2017 the profit was at 38503320
+In 2018 the profit was at 37063850. In the year 2019 they made 30020250.
+Making 2017 there most profitable year in the last three (3) years.
+
+### 5. The months with the least profit in the last three(3) years.
+
+Filtering and analyzing the data with the inbuilt tool in the Rstudio, it was discovered that the least profit was recorded in December 2017 with a profit of 35000.
+
+### 6. What was the minimum profit of December 2018
+
+``` {r minimum profit}
+ib%>%
+  filter(YEARS==2018 & MONTHS=="December")%>%
+  arrange((PROFIT))
+```
+
+The minimum profit according to the data above is 38150.
+
+### 7. Compare the profits for each month in 2019 in percentage
+
+  From our previous calculation we discovered that the total profit for the year 2019 is 30020250. Therefore, to get the percentage, we divide the total of each month in 2019 by the overall total all multiplied by 100. Mathematically; (total of months/Overall total)*100. Then tabulate the answer.
+``` {r Percentage able}
+  
+MONTHS_PERC <- tibble(
+MONTHS=c("January","February","March","April","May","June","July","August","September","October","November","December"),
+TOTAL_PROFIT=c(32613160,1366880,2530620,2851470,2573040,2669080,2945340,2982800,1892600,2220870,2675610,2048780),
+PERCENT=c(10.87,4.55,8.43,9.50,8.57,8.90,9.81,9.94,6.30,7.40,8.91,6.82),
+)
+MONTHS_PERC
+```
+Comparing there profit according to the data above, January recorded the highest profit with 10.87%
+
+## BRAND ANALYSIS
+
+### 1. Top three (3) brands in the Francophone Countries
+``` {r filtering for only two years in francophone countries}
+FrancoPhone%>%
+  filter(YEARS!=2017)%>%
+  arrange(desc(QUANTITY))
+```
+According to the data above Hero, Trophy and Budweiser sold the highest, making them the top 3 brands in the region.
+
+### 2. Top two choice of brands in Ghana
+
+``` {r top 2 choices in ghana}
+AngloPhone%>%
+  filter(COUNTRIES=="Ghana")%>%
+  arrange(desc(QUANTITY))
+``` 
+The top two choices of Ghana according to the data above is Hero and Casle lite.
+
+### 3. Beer consumed by the Oil rich countries of West Africa
+
+  The oil rich countries of West Africa are Ghana and Nigeria and in the last three years they've been consuming 256492 volume of beer for the last three years.
+``` {r aggregate of beer consumed}
+
+beer<-AngloPhone%>%filter(BRANDS=="hero" | BRANDS=="trophy" | BRANDS=="castle lite" | BRANDS=="eagle lager" | BRANDS=="budweiser")
+x<-beer$QUANTITY
+sum(beer$QUANTITY)
+beer
+```
+
+
+### 4. The malt choice of the Anglophone countries
+
+```{r a summarised table showing brands and quantities}
+AngloPhone%>%
+  group_by(BRANDS)%>%
+  summarise(sum(QUANTITY))
+```
+The data above shows Betamalt as the most preferred malt brand.
+
+## 5. Highest sale in 2019
+``` {r highest sale data}
+
+AngloPhone%>%
+  group_by(YEARS==2019, BRANDS, COUNTRIES=="Nigeria")%>%
+  summarise(sum(QUANTITY))
+```
+
+Castle lite had the highest sale of 22293 in Nigeria.
+
+### 6. Favorite brand in the South_South Region of Nigeria.
+
+``` {r favorite brand in the southsouth region of Nigeria}
+
+AngloPhone%>%
+  group_by(BRANDS, COUNTRIES=="Nigeria",REGION=="southsouth")%>%
+  summarise(sum(QUANTITY))
+```
+The favorite brand of South_South region is Eagle lager with a figure of 4552.
+
+### 7. Beer Consumption in Nigeria
+
+``` {r beer consumption in Nigeria}
+beer_n<-beer%>%filter(COUNTRIES=="Nigeria")
+x<-beer_n$QUANTITY
+sum(beer_n$QUANTITY)
+beer_n
+```
+
+The total consumption of beer in Nigeria according to the data above, stands at 129260.
+
+### 8. Level of consumption of Budweiser in the regions in Nigeria.
+
+``` {r Budweiser consumption}
+
+beer_n%>%
+  group_by(BRANDS=="budweiser",REGION)%>%
+  summarise(level_of_consumption=sum(QUANTITY))
+```
+ The table above shows the consumption of budweiser in the regions in Nigeria. The value with the TRUE statement shows the real distinct values.
+
+### 9. Level of consumption of Budweiser in the Regions in Nigeria in 2019.
+
+``` {r Budweiser consumption due to promo}
+beer_n%>%
+  group_by(BRANDS=="budweiser",REGION, YEARS==2019)%>%
+  summarise(sum(QUANTITY))
+```
+Due to the promo offered on Budweiser, the demand for it increased as seen on the table. The TRUE statement values are the real distinct values.
+
+## COUNTRIES ANALYSIS
+
+### 1. Countries with highest consumption of beers.
+
+```{r beer consumption}
+beer_c<-ib%>%filter(BRANDS=="hero" | BRANDS=="trophy" | BRANDS=="castle lite" | BRANDS=="eagle lager" | BRANDS=="budweiser")
+beer_c
+
+beer_c%>%
+  group_by(BRANDS,COUNTRIES)%>%
+  summarise(Consumption=sum(QUANTITY))
+beer_c%>%
+  group_by(COUNTRIES)%>%
+  summarise(Consumption=sum(QUANTITY))
+```
+
+The data above shows the consumptions of beer according to the countries. The first data shows shows the countries and the brands while the second shows the total amount of beer consumed by each countries.
+
+##2. The best Sales Rep in Senegal.
+
+```{r sales rep data}
+FrancoPhone%>%
+  group_by(SALES_REP,COUNTRIES=="Senegal")%>%
+  summarise(sales=sum(QUANTITY))
+```
+
+According to the table above Jones made the highest sale in Senegal.
+
+### 3. Country with the highest profit in the fourth quarter.
+
+```{r Fourth quarter profit}
+fourth_q<-ib%>%filter(YEARS==2019, MONTHS=="October"|MONTHS=="November"|MONTHS=="December")
+fourth_q
+
+fourth_q%>%
+  group_by(COUNTRIES,MONTHS)%>%
+  summarise(Profit_q=sum(PROFIT))
+  
+fourth_q%>%
+  group_by(COUNTRIES)%>%
+  summarise(sum(PROFIT))
+
+
+```
+According to the data above, Ghana has the highest profit in the fourth quarter of 2019 which is from october to december 2019.
+
+## SUMMARY
+
+  The International Breweries data set contained data from five(5) African Countries (2 Anglophone countries; Nigeria and Ghana and 3 Francophone countries; Benin, Senegal and Togo). The data contained all the records of their sales for the period three (3) years (2017-2019).
+The sales manager hopes to use the analyses of this data to increase profit and reduce lost to minimum. From the analysis, one can see that certain product dropped in profit over the years, this could be caused by diverse circumstances like economy, weather or the quality of the product. Regions in a country and the country itself also affect the sales and profit over the years.
+
+## CONCLUSION
+
+  With this analysis, the sales manager can now make effective business decisions that can drive the company further and away from possible losses. Adequate stakeholders will be engaged and tasked to bring these plans to fruition.
